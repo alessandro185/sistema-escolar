@@ -81,25 +81,25 @@ DB_PORT=3306
 ### 5. Executar migrações
 
 ```bash
-python manage.py migrate
+python backend/manage.py migrate
 ```
 
 ### 6. Criar usuários de teste
 
 ```bash
-python manage.py create_test_users
+python backend/manage.py create_test_users
 ```
 
 ### 7. Coletar arquivos estáticos
 
 ```bash
-python manage.py collectstatic --noinput
+python backend/manage.py collectstatic --noinput
 ```
 
 ### 8. Iniciar o servidor
 
 ```bash
-python manage.py runserver
+python backend/manage.py runserver
 ```
 
 ## 🌐 Acessar o Sistema
@@ -134,7 +134,7 @@ Solução: Verificar se o MySQL está rodando e as credenciais estão corretas n
 Solução: Executar em outra porta
 
 ```bash
-python manage.py runserver 8001
+python backend/manage.py runserver 8001
 ```
 
 ## 📝 Próximos Passos

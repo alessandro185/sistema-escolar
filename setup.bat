@@ -21,18 +21,18 @@ pip install -q -r requirements.txt
 REM 3. Executar migrações
 echo.
 echo [3/6] Executando migrações do banco de dados...
-python manage.py makemigrations
-python manage.py migrate
+python backend/manage.py makemigrations
+python backend/manage.py migrate
 
 REM 4. Criar usuários e dados de teste
 echo.
 echo [4/6] Criando usuários e dados de teste...
-python manage.py shell < init_db.py
+python backend/manage.py shell < backend/scripts/init_db.py
 
 REM 5. Coletar arquivos estáticos
 echo.
 echo [5/6] Coletando arquivos estáticos...
-python manage.py collectstatic --noinput -q
+python backend/manage.py collectstatic --noinput -q
 
 REM 6. Iniciar servidor
 echo.
@@ -51,8 +51,8 @@ echo.
 echo Pressione CTRL+C para parar o servidor
 echo.
 
-python manage.py runserver
+python backend/manage.py runserver
 echo ========================================
 echo.
 
-python manage.py runserver
+python backend/manage.py runserver

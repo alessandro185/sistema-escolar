@@ -1,11 +1,14 @@
 """
 Script para inicializar o banco de dados com dados de teste
-Execute com: python manage.py shell < init_db.py
+Execute com: python backend/manage.py shell < backend/scripts/init_db.py
 """
 
 import os
 import django
+import sys
+from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
 

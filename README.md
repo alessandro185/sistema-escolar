@@ -15,26 +15,19 @@ Sistema completo de gestão escolar desenvolvido em Django para escolas de ensin
 ## 🛠️ Stack Tecnológico
 
 - **Backend**: Django 4.2
-- **Banco de Dados**: MySQL
+- **Banco de Dados**: SQLite local e PostgreSQL em producao
 - **Frontend**: Django Templates + Tailwind CSS + Alpine.js
 - **Upload de arquivos**: Django media (fotos de alunos)
 
 ## 📋 Estrutura de Apps
 
-```
-escola_sistema/
-├── config/          # Configurações do projeto
-├── apps/
-│   ├── usuarios/    # Autenticação e controle de permissões
-│   ├── alunos/      # Gestão de alunos
-│   ├── professores/ # Gestão de professores
-│   ├── turmas/      # Gestão de turmas
-│   ├── notas/       # Sistema de notas
-│   └── dashboard/   # Dashboard principal
-├── templates/       # Templates HTML
-├── static/          # CSS, JS estático
-├── media/           # Upload de arquivos (fotos)
-└── manage.py
+```text
+.
+├── backend/                 # Django: apps, config, scripts e manage.py
+├── frontend/                # Templates Django e arquivos estáticos
+├── requirements.txt         # Dependências Python instaladas pela Vercel
+├── vercel.json              # Inclui templates no pacote da Function
+└── .python-version          # Versão Python usada na Vercel
 ```
 
 ## 🚀 Instalação e Configuração
@@ -92,38 +85,38 @@ cp .env.example .env
 ### 6. Executar migrações
 
 ```bash
-python manage.py migrate
+python backend/manage.py migrate
 ```
 
 ### 7. Criar superusuário
 
 ```bash
-python manage.py createsuperuser
+python backend/manage.py createsuperuser
 ```
 
 ### 8. Criar usuários de teste
 
 ```bash
-python manage.py create_test_users
+python backend/manage.py create_test_users
 ```
 
 ### 9. Coletar arquivos estáticos
 
 ```bash
-python manage.py collectstatic --noinput
+python backend/manage.py collectstatic --noinput
 ```
 
 ### 10. Executar servidor de desenvolvimento
 
 ```bash
-python manage.py runserver
+python backend/manage.py runserver
 ```
 
 Acesse em: `http://localhost:8000`
 
 ## 👥 Contas de Teste
 
-Após executar `python manage.py create_test_users`:
+Após executar `python backend/manage.py create_test_users`:
 
 | Cargo          | Usuário   | Senha    |
 | -------------- | --------- | -------- |

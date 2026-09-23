@@ -74,7 +74,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [BASE_DIR.parent / 'frontend' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -93,12 +93,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # Em produção defina DATABASE_URL (ex.: postgresql://user:senha@host/db?sslmode=require).
-# Sem DATABASE_URL, usa SQLite local.
+# Sem DATABASE_URL, usa SQLite local na raiz do repositório.
 DATABASE_URL = config('DATABASE_URL', default=None)
 if not DATABASE_URL:
     if not DEBUG:
         raise ValueError('Configure DATABASE_URL com um PostgreSQL persistente em producao.')
-    DATABASE_URL = f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
+    DATABASE_URL = f"sqlite:///{BASE_DIR.parent / 'db.sqlite3'}"
 
 DATABASES = {
     'default': dj_database_url.parse(
@@ -141,7 +141,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / 'static'] if (BASE_DIR / 'static').exists() else []
+FRONTEND_STATIC_DIR = BASE_DIR.parent / 'frontend' / 'static'
+STATICFILES_DIRS = [FRONTEND_STATIC_DIR] if FRONTEND_STATIC_DIR.exists() else []
 
 STORAGES = {
     'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},

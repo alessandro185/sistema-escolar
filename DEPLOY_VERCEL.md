@@ -5,7 +5,7 @@ O projeto usa Django com WSGI (`config.wsgi.application`). A Vercel detecta o `m
 ## Configuração do projeto
 
 1. Importe o repositório na Vercel.
-2. Em **Root Directory**, selecione `escola_sistema` (a pasta que contém `manage.py` e `requirements.txt`).
+2. Deixe **Root Directory** na raiz do repositório. A raiz contém `requirements.txt`; o `manage.py` está em `backend/`.
 3. Use o preset Django/Python detectado automaticamente. Não defina um Build Command personalizado.
 4. Adicione as variáveis abaixo em **Settings → Environment Variables** para Production e Preview conforme necessário.
 
@@ -25,10 +25,10 @@ Depois de configurar as variáveis, aplique as migrações no banco de produçã
 
 ```bash
 vercel env pull .env
-python manage.py migrate
+python backend/manage.py migrate
 ```
 
-Execute isso a partir da pasta `escola_sistema`, com o projeto Vercel já vinculado (`vercel link`). O `.env` já está no `.gitignore`; não o envie ao repositório. Não carregue dados de teste em produção.
+Execute isso a partir da raiz do repositório, com o projeto Vercel já vinculado (`vercel link`). O `.env` já está no `.gitignore`; não o envie ao repositório. Não carregue dados de teste em produção.
 
 ## Limitação de fotos dos alunos
 
@@ -39,8 +39,8 @@ As fotos são gravadas em `MEDIA_ROOT` no disco local. Esse disco é efêmero na
 Com as variáveis de produção disponíveis no ambiente e antes do deploy:
 
 ```bash
-python manage.py check --deploy
-python manage.py migrate --check
+python backend/manage.py check --deploy
+python backend/manage.py migrate --check
 ```
 
 O HTTPS é terminado pela Vercel; as configurações de produção do Django redirecionam HTTP para HTTPS, habilitam cookies seguros e HSTS. Se mudar `SECURE_HSTS_SECONDS` ou o domínio, revise as variáveis antes de publicar.
