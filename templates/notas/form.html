@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block title %}Lançar Nota - Escola Sistema{% endblock %}
+{% block content %}
+<div class="mb-8">
+  <a href="{% url 'notas:lista' %}" class="text-blue-600 hover:text-blue-800 mb-4 inline-block">← Voltar para notas</a>
+  <h1 class="text-3xl font-bold text-gray-800">Lançar Nota</h1>
+</div>
+
+<div class="bg-white rounded-lg shadow p-6 max-w-3xl">
+  <form method="post" class="space-y-6">
+    {% csrf_token %}
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.aluno.label }}</label>
+        {{ form.aluno }}
+        {% if form.aluno.errors %}
+        <p class="text-red-600 text-sm mt-1">{{ form.aluno.errors.0 }}</p>
+        {% endif %}
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.turma.label }}</label>
+        {{ form.turma }}
+        {% if form.turma.errors %}
+        <p class="text-red-600 text-sm mt-1">{{ form.turma.errors.0 }}</p>
+        {% endif %}
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.professor.label }}</label>
+        {{ form.professor }}
+        {% if form.professor.errors %}
+        <p class="text-red-600 text-sm mt-1">{{ form.professor.errors.0 }}</p>
+        {% endif %}
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.disciplina.label }}</label>
+        {{ form.disciplina }}
+        {% if form.disciplina.errors %}
+        <p class="text-red-600 text-sm mt-1">{{ form.disciplina.errors.0 }}</p>
+        {% endif %}
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.nota_1.label }}</label>
+        {{ form.nota_1 }}
+        {% if form.nota_1.errors %}
+        <p class="text-red-600 text-sm mt-1">{{ form.nota_1.errors.0 }}</p>
+        {% endif %}
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.nota_2.label }}</label>
+        {{ form.nota_2 }}
+        {% if form.nota_2.errors %}
+        <p class="text-red-600 text-sm mt-1">{{ form.nota_2.errors.0 }}</p>
+        {% endif %}
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.nota_3.label }}</label>
+        {{ form.nota_3 }}
+        {% if form.nota_3.errors %}
+        <p class="text-red-600 text-sm mt-1">{{ form.nota_3.errors.0 }}</p>
+        {% endif %}
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.nota_4.label }}</label>
+        {{ form.nota_4 }}
+        {% if form.nota_4.errors %}
+        <p class="text-red-600 text-sm mt-1">{{ form.nota_4.errors.0 }}</p>
+        {% endif %}
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.situacao.label }}</label>
+        {{ form.situacao }}
+        {% if form.situacao.errors %}
+        <p class="text-red-600 text-sm mt-1">{{ form.situacao.errors.0 }}</p>
+        {% endif %}
+      </div>
+    </div>
+    
+    <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+      <a href="{% url 'notas:lista' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg">
+        Cancelar
+      </a>
+      <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
+        Salvar Nota
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

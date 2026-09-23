@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="pt-br" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" x-init="if(darkMode) document.documentElement.classList.add('dark')">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Escola Sistema{% endblock %}</title>
+
+    <!-- Fonte Inter do Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+      }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- Alpine.js para interatividade simples -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+      * {
+        font-family: 'Inter', sans-serif;
+      }
+      
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+      
+      .card-hover:hover {
+        transform: translateY(-5px);
+      }
+      
+      .btn-hover {
+        transition: all 0.3s ease;
+      }
+      
+      .btn-hover:hover {
+        transform: translateY(-1px);
+      }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+  </head>
+  <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300">
+    {% if user.is_authenticated %}
+    <!-- Navbar -->
+    <nav class="bg-slate-900 dark:bg-slate-900 text-slate-100 shadow-lg">
+      <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+        <!-- Logo -->
+        <a href="{% url 'dashboard:index' %}" class="flex items-center gap-3 text-2xl font-bold">
+          <i data-lucide="graduation-cap" class="w-8 h-8 text-blue-400"></i>
+          <span>Escola Sistema</span>
+        </a>
+
+        <!-- Menu Desktop -->
+        <div class="hidden md:flex items-center gap-8">
+          <a href="{% url 'dashboard:index' %}" class="flex flex-col items-center gap-1 text-slate-300 hover:text-white transition">
+            <i data-lucide="home" class="w-7 h-7"></i>
+            <span class="text-sm font-medium">Início</span>
+          </a>
+          <a href="{% url 'alunos:lista' %}" class="flex flex-col items-center gap-1 text-slate-300 hover:text-white transition">
+            <i data-lucide="users" class="w-7 h-7"></i>
+            <span class="text-sm font-medium">Alunos</span>
+          </a>
+          <a href="{% url 'funcionarios:lista' %}" class="flex flex-col items-center gap-1 text-slate-300 hover:text-white transition">
+            <i data-lucide="briefcase" class="w-7 h-7"></i>
+            <span class="text-sm font-medium">Funcionários</span>
+          </a>
+          <a href="{% url 'turmas:lista' %}" class="flex flex-col items-center gap-1 text-slate-300 hover:text-white transition">
+            <i data-lucide="book-open" class="w-7 h-7"></i>
+            <span class="text-sm font-medium">Turmas</span>
+          </a>
+          <a href="{% url 'professores:lista' %}" class="flex flex-col items-center gap-1 text-slate-300 hover:text-white transition">
+            <i data-lucide="user-check" class="w-7 h-7"></i>
+            <span class="text-sm font-medium">Professores</span>
+          </a>
+        </div>
+
+        <!-- User Menu e Dark Mode Toggle -->
+        <div class="flex items-center gap-6">
+          <!-- Dark Mode Toggle -->
+          <button 
+            @click="darkMode = !darkMode; if(darkMode) { document.documentElement.classList.add('dark'); localStorage.setItem('darkMode', 'true'); } else { document.documentElement.classList.remove('dark'); localStorage.setItem('darkMode', 'false'); } lucide.createIcons();"
+            class="btn-hover p-3 rounded-lg bg-slate-800 hover:bg-slate-700 transition"
+            :title="darkMode ? 'Modo Claro' : 'Modo Escuro'"
+          >
+            <i x-show="!darkMode" data-lucide="moon" class="w-6 h-6 text-slate-300"></i>
+            <i x-show="darkMode" data-lucide="sun" class="w-6 h-6 text-yellow-400"></i>
+          </button>
+          
+          <div class="text-right">
+            <p class="text-lg font-semibold text-white">{{ user.first_name|default:user.username }}</p>
+            <p class="text-slate-400 text-sm">{{ cargo_usuario }}</p>
+          </div>
+          <form method="post" action="{% url 'usuarios:logout' %}" class="inline">
+            {% csrf_token %}
+            <button type="submit" class="btn-hover flex items-center gap-2 bg-red-600 hover:bg-red-700 px-6 py-3 rounded-lg font-medium transition">
+              <i data-lucide="log-out" class="w-5 h-5"></i>
+              Sair
+            </button>
+          </form>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-10">
+      {% if messages %} {% for message in messages %}
+      <div class="mb-8 p-6 rounded-xl text-lg font-medium {% if message.tags %}{{ message.tags }}{% else %}bg-blue-500 text-white{% endif %}">
+        {{ message }}
+      </div>
+      {% endfor %} {% endif %}
+      
+      {% block content %}{% endblock %}
+    </main>
+    
+    {% else %}
+    <!-- Login page - no navbar -->
+    {% block login_content %}{% endblock %}
+    {% endif %}
+    
+    <script>
+      // Inicializar ícones Lucide
+      document.addEventListener('alpine:init', () => {
+        lucide.createIcons();
+      });
+      lucide.createIcons();
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}{% if turma %}Editar{% else %}Nova{% endif %} Turma - Escola Sistema{% endblock %}
+{% block content %}
+<div class="mb-8">
+  <a href="{% url 'turmas:lista' %}" class="text-blue-600 hover:text-blue-800 mb-4 inline-block">← Voltar para lista</a>
+  <h1 class="text-3xl font-bold text-gray-800">{% if turma %}Editar Turma{% else %}Nova Turma{% endif %}</h1>
+</div>
+
+<div class="bg-white rounded-lg shadow p-6 max-w-2xl">
+  <form method="post" class="space-y-6">
+    {% csrf_token %}
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.ano.label }}</label>
+        {{ form.ano }}
+        {% if form.ano.errors %}
+        <p class="text-red-600 text-sm mt-1">{{ form.ano.errors.0 }}</p>
+        {% endif %}
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.letra.label }}</label>
+        {{ form.letra }}
+        {% if form.letra.errors %}
+        <p class="text-red-600 text-sm mt-1">{{ form.letra.errors.0 }}</p>
+        {% endif %}
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.ano_letivo.label }}</label>
+        {{ form.ano_letivo }}
+        {% if form.ano_letivo.errors %}
+        <p class="text-red-600 text-sm mt-1">{{ form.ano_letivo.errors.0 }}</p>
+        {% endif %}
+      </div>
+      
+      <div class="flex items-center md:col-span-2">
+        {{ form.ativa }}
+        <label class="ml-2 block text-sm text-gray-700">{{ form.ativa.label }}</label>
+      </div>
+    </div>
+    
+    <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+      <a href="{% url 'turmas:lista' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg">
+        Cancelar
+      </a>
+      <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
+        {% if turma %}Salvar Alterações{% else %}Criar Turma{% endif %}
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

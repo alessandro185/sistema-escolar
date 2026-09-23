@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% block title %}Funcionários - Escola Sistema{% endblock %}
+{% block content %}
+<div class="mb-10">
+  <div class="flex items-center justify-between flex-wrap gap-4">
+    <div>
+      <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">Funcionários</h1>
+      <p class="text-slate-500 mt-2 dark:text-slate-400">Total: {{ total }} funcionários ativos</p>
+    </div>
+  </div>
+</div>
+
+{% if tem_pendencias %}
+<div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-5 mb-8">
+  <div class="flex items-center gap-4">
+    <i data-lucide="alert-triangle" class="w-7 h-7 text-amber-600 dark:text-amber-400"></i>
+    <span class="text-amber-800 dark:text-amber-200 font-medium text-lg">Há cadastros com dados incompletos</span>
+  </div>
+</div>
+{% endif %}
+
+<!-- Pills por cargo -->
+<div class="flex flex-wrap gap-2 mb-8">
+  <a href="{% url 'funcionarios:lista' %}" class="btn-hover px-5 py-2.5 rounded-lg font-medium transition {% if not cargo_selecionado %}bg-blue-600 text-white{% else %}bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700{% endif %}">
+    Todos
+  </a>
+  {% for valor, nome in cargos %}
+  <a href="{% url 'funcionarios:lista' %}?cargo={{ valor }}" class="btn-hover px-5 py-2.5 rounded-lg font-medium transition {% if cargo_selecionado == valor %}bg-blue-600 text-white{% else %}bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700{% endif %}">
+    {{ nome }}
+  </a>
+  {% endfor %}
+</div>
+
+<!-- Barra de filtros -->
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-lg p-6 mb-8 border border-slate-200 dark:border-slate-800">
+  <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div>
+      <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Busca</label>
+      <div class="relative">
+        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i>
+        <input type="text" name="q" value="{{ busca|default:'' }}" placeholder="Nome ou ID Funcional" class="w-full pl-10 pr-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+      </div>
+    </div>
+    
+    <div>
+      <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Departamento</label>
+      <div class="relative">
+        <i data-lucide="building-2" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i>
+        <select name="departamento" class="w-full pl-10 pr-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none">
+          <option value="">Todos</option>
+          {% for valor, nome in departamentos %}
+          <option value="{{ valor }}" {% if departamento_selecionado == valor %}selected{% endif %}>{{ nome }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    
+    <div class="flex items-end gap-3">
+      <button type="submit" class="btn-hover flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition">
+        <i data-lucide="filter" class="w-5 h-5"></i>
+        Filtrar
+      </button>
+      {% if busca or cargo_selecionado or departamento_selecionado %}
+      <a href="{% url 'funcionarios:lista' %}" class="btn-hover flex items-center justify-center gap-2 px-6 py-3 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium rounded-lg hover:bg-slate-300 dark:hover:bg-slate-700 transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+        Limpar
+      </a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+
+<!-- Tabela de funcionários -->
+{% if funcionarios %}
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead class="bg-slate-50 dark:bg-slate-800">
+        <tr>
+          <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">ID Funcional</th>
+          <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Nome</th>
+          <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Cargo</th>
+          <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Departamento</th>
+          <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Salário</th>
+          <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Admissão</th>
+          <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Ações</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+        {% for func in funcionarios %}
+        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
+          <td class="px-6 py-4 text-sm font-medium text-slate-900 dark:text-slate-100">{{ func.id_func }}</td>
+          <td class="px-6 py-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm
+                {% if func.cargo == 'professor' %}bg-blue-600{% elif func.cargo == 'coordenador' %}bg-purple-600{% elif func.cargo == 'diretor' %}bg-sky-700{% elif func.cargo == 'administrativo' %}bg-teal-700{% else %}bg-slate-500{% endif %}">
+                {{ func.nome|slice:":2"|upper }}
+              </div>
+              <span class="text-sm font-medium text-slate-900 dark:text-slate-100">{{ func.nome }}</span>
+            </div>
+          </td>
+          <td class="px-6 py-4">
+            <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium
+              {% if func.cargo == 'professor' %}bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300{% elif func.cargo == 'coordenador' %}bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300{% elif func.cargo == 'diretor' %}bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300{% elif func.cargo == 'administrativo' %}bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300{% else %}bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300{% endif %}">
+              {{ func.get_cargo_display }}
+            </span>
+          </td>
+          <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">{{ func.get_departamento_display|default:"—" }}</td>
+          <td class="px-6 py-4">
+            <span class="text-sm {% if not func.salario_base %}text-slate-500 dark:text-slate-400{% else %}text-slate-900 dark:text-slate-100 font-medium{% endif %}">
+              {{ func.salario_display }}
+            </span>
+          </td>
+          <td class="px-6 py-4">
+            {% if func.data_admissao %}
+            <span class="text-sm text-slate-600 dark:text-slate-400">{{ func.data_admissao|date:"d/m/Y" }}</span>
+            {% else %}
+            <span class="inline-flex items-center gap-1 text-sm text-amber-600 dark:text-amber-400 font-medium">
+              <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+              {{ func.data_admissao_obs|default:"Verificar" }}
+            </span>
+            {% endif %}
+          </td>
+          <td class="px-6 py-4">
+            <a href="{% url 'funcionarios:detalhe' func.pk %}" class="btn-hover inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium text-sm">
+              <i data-lucide="eye" class="w-4 h-4"></i>
+              Ver
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<!-- Estado vazio -->
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 p-16 text-center">
+  <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-slate-100 dark:bg-slate-800 mb-6">
+    <i data-lucide="briefcase" class="w-12 h-12 text-slate-400"></i>
+  </div>
+  <h3 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-3">Nenhum funcionário encontrado</h3>
+  <p class="text-slate-500 dark:text-slate-400 mb-8 max-w-md mx-auto">Tente ajustar os filtros de busca para encontrar o que está procurando</p>
+  {% if busca or cargo_selecionado or departamento_selecionado %}
+  <a href="{% url 'funcionarios:lista' %}" class="btn-hover inline-flex items-center gap-2 px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition">
+    <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+    Limpar filtros
+  </a>
+  {% endif %}
+</div>
+{% endif %}
+
+<!-- Paginação -->
+{% if page_obj.has_other_pages %}
+<div class="flex justify-center items-center gap-3 mt-10">
+  {% if page_obj.has_previous %}
+  <a href="?page={{ page_obj.previous_page_number }}{% if busca %}&q={{ busca }}{% endif %}{% if cargo_selecionado %}&cargo={{ cargo_selecionado }}{% endif %}{% if departamento_selecionado %}&departamento={{ departamento_selecionado }}{% endif %}" class="btn-hover flex items-center gap-2 px-5 py-2.5 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-700 transition">
+    <i data-lucide="chevron-left" class="w-5 h-5"></i>
+    Anterior
+  </a>
+  {% endif %}
+  
+  <span class="px-5 py-2.5 text-slate-600 dark:text-slate-400 font-medium">
+    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+  </span>
+  
+  {% if page_obj.has_next %}
+  <a href="?page={{ page_obj.next_page_number }}{% if busca %}&q={{ busca }}{% endif %}{% if cargo_selecionado %}&cargo={{ cargo_selecionado }}{% endif %}{% if departamento_selecionado %}&departamento={{ departamento_selecionado }}{% endif %}" class="btn-hover flex items-center gap-2 px-5 py-2.5 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-700 transition">
+    Próximo
+    <i data-lucide="chevron-right" class="w-5 h-5"></i>
+  </a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

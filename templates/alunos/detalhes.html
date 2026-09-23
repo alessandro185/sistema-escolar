@@ -1,0 +1,297 @@
+{% extends 'base.html' %}
+{% block title %}{{ aluno.nome }} - Escola Sistema{% endblock %}
+{% block content %}
+<style>
+  :root {
+    --color-primary: #2563eb;
+    --color-success: #16a34a;
+    --color-warning: #ca8a04;
+    --color-danger: #dc2626;
+  }
+  
+  .hero {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .badge-large {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  
+  .badge-success {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+  
+  .badge-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+  }
+  
+  .card {
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+  }
+  
+  .card-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  .info-row:last-child {
+    border-bottom: none;
+  }
+  
+  .info-label {
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+  
+  .info-value {
+    color: #1f2937;
+    font-weight: 500;
+  }
+  
+  .warning-icon {
+    color: var(--color-warning);
+  }
+</style>
+
+<!-- Hero Section -->
+<div class="hero">
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <a href="{% url 'alunos:lista' %}" class="text-blue-200 hover:text-white mb-2 inline-flex items-center gap-2">
+        ← Voltar para lista
+      </a>
+      <h1 class="text-3xl font-bold mb-2">{{ aluno.nome }}</h1>
+      <p class="text-blue-100">
+        Matrícula: {{ aluno.matricula }}
+        {% if aluno.turma %}
+        • {{ aluno.turma.ano }}º Ano - Turma {{ aluno.turma.letra }}
+        {% endif %}
+      </p>
+    </div>
+    <div class="flex items-center gap-4">
+      <div class="badge-large {% if aluno.ativo %}badge-success{% else %}badge-danger{% endif %}">
+        {% if aluno.ativo %}Ativo{% else %}Inativo{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Grid de Cards -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- Foto e ações rápidas -->
+  <div class="lg:col-span-1 space-y-6">
+    <div class="card">
+      <div class="flex flex-col items-center">
+        {% if aluno.foto %}
+        <img src="{{ aluno.foto.url }}" alt="{{ aluno.nome }}" 
+             class="w-32 h-32 rounded-full object-cover mb-4 border-4 border-white shadow-lg">
+        {% else %}
+        <div class="w-32 h-32 rounded-full bg-blue-100 flex items-center justify-center mb-4 border-4 border-white shadow-lg">
+          <span class="text-5xl text-blue-600">👤</span>
+        </div>
+        {% endif %}
+      </div>
+      <div class="space-y-3 mt-4">
+        <a href="{% url 'alunos:editar' aluno.pk %}" 
+           class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-center block">
+          Editar Aluno
+        </a>
+        <a href="{% url 'alunos:deletar' aluno.pk %}" 
+           class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-center block">
+          Remover Aluno
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dados pessoais e responsáveis -->
+  <div class="lg:col-span-2 space-y-6">
+    <!-- Dados pessoais -->
+    <div class="card">
+      <h2 class="card-title">📋 Dados Pessoais</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="info-row md:col-span-2">
+          <span class="info-label">Nome Completo</span>
+          <span class="info-value">{{ aluno.nome }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Matrícula</span>
+          <span class="info-value">{{ aluno.matricula }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">CPF</span>
+          <span class="info-value">{{ aluno.cpf }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Data de Nascimento</span>
+          <span class="info-value">{{ aluno.data_nascimento|date:"d/m/Y" }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Gênero</span>
+          <span class="info-value">{{ aluno.get_genero_display }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Email</span>
+          <span class="info-value">{{ aluno.email|default:"Não informado" }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Telefone</span>
+          <span class="info-value flex items-center gap-2">
+            {{ aluno.telefone|default:"Não informado" }}
+            {% if not aluno.telefone or aluno.telefone == '' %}
+            <span class="warning-icon" title="Telefone não informado">⚠️</span>
+            {% endif %}
+          </span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Turma</span>
+          <span class="info-value">
+            {% if aluno.turma %}{{ aluno.turma.ano }}º Ano - Turma {{ aluno.turma.letra }}{% else %}-{% endif %}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Responsável -->
+    <div class="card">
+      <h2 class="card-title">👨‍👩‍👧 Responsável</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="info-row md:col-span-2">
+          <span class="info-label">Nome do Responsável</span>
+          <span class="info-value flex items-center gap-2">
+            {{ aluno.responsavel_nome|default:"Não informado" }}
+            {% if not aluno.responsavel_nome or aluno.responsavel_nome == '' %}
+            <span class="warning-icon" title="Nome do responsável não informado">⚠️</span>
+            {% endif %}
+          </span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Telefone</span>
+          <span class="info-value flex items-center gap-2">
+            {% if aluno.responsavel_telefone %}
+            <a href="tel:{{ aluno.responsavel_telefone }}" class="text-blue-600 hover:text-blue-800">
+              {{ aluno.responsavel_telefone }}
+            </a>
+            {% else %}
+            Não informado
+            <span class="warning-icon" title="Telefone do responsável não informado">⚠️</span>
+            {% endif %}
+          </span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Email</span>
+          <span class="info-value">
+            {% if aluno.responsavel_email %}
+            <a href="mailto:{{ aluno.responsavel_email }}" class="text-blue-600 hover:text-blue-800">
+              {{ aluno.responsavel_email }}
+            </a>
+            {% else %}
+            Não informado
+            {% endif %}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Endereço -->
+    <div class="card">
+      <h2 class="card-title">🏠 Endereço</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="info-row md:col-span-2">
+          <span class="info-label">Endereço</span>
+          <span class="info-value flex items-center gap-2">
+            {% if aluno.endereco and aluno.endereco != 'Não consta' %}
+            {{ aluno.endereco }}{% if aluno.numero %}, {{ aluno.numero }}{% endif %}
+            {% else %}
+            Não consta
+            <span class="warning-icon" title="Endereço não informado">⚠️</span>
+            {% endif %}
+          </span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Complemento</span>
+          <span class="info-value">{{ aluno.complemento|default:"-" }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Bairro</span>
+          <span class="info-value">{{ aluno.bairro|default:"-" }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Cidade/Estado</span>
+          <span class="info-value">
+            {% if aluno.cidade %}{{ aluno.cidade }}{% endif %}{% if aluno.estado %}/{{ aluno.estado }}{% endif %}{% if not aluno.cidade and not aluno.estado %}-{% endif %}
+          </span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">CEP</span>
+          <span class="info-value">{{ aluno.cep|default:"-" }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notas -->
+    {% if notas %}
+    <div class="card">
+      <h2 class="card-title">📝 Notas</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Disciplina</th>
+              <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">1º Bim</th>
+              <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">2º Bim</th>
+              <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">3º Bim</th>
+              <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">4º Bim</th>
+              <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Média</th>
+              <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Situação</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            {% for nota in notas %}
+            <tr>
+              <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{ nota.disciplina }}</td>
+              <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 text-center">{{ nota.nota_1|default:"-" }}</td>
+              <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 text-center">{{ nota.nota_2|default:"-" }}</td>
+              <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 text-center">{{ nota.nota_3|default:"-" }}</td>
+              <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 text-center">{{ nota.nota_4|default:"-" }}</td>
+              <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-center">{{ nota.media }}</td>
+              <td class="px-4 py-3 whitespace-nowrap text-center">
+                <span class="badge {% if nota.situacao == 'aprovado' %}badge-success{% elif nota.situacao == 'reprovado' %}badge-danger{% else %}badge-warning{% endif %}">
+                  {{ nota.get_situacao_display }}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

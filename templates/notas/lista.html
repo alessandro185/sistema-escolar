@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Notas - Escola Sistema{% endblock %}
+{% block content %}
+<div class="mb-8">
+  <h1 class="text-3xl font-bold text-gray-800">Notas</h1>
+  <p class="text-gray-600 mt-2">Gestão de notas dos alunos</p>
+</div>
+
+<!-- Formulário de filtro -->
+<div class="bg-white rounded-lg shadow p-6 mb-6">
+  <form method="get" class="flex flex-col md:flex-row gap-4 flex-wrap">
+    <div class="w-full md:w-64">
+      <select name="turma" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        <option value="">Todas as turmas</option>
+        {% for turma in turmas %}
+        <option value="{{ turma.pk }}" {% if request.GET.turma == turma.pk|stringformat:"i" %}selected{% endif %}>{{ turma }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="w-full md:w-64">
+      <select name="situacao" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        <option value="">Todas as situações</option>
+        <option value="ativo" {% if request.GET.situacao == 'ativo' %}selected{% endif %}>Ativo</option>
+        <option value="aprovado" {% if request.GET.situacao == 'aprovado' %}selected{% endif %}>Aprovado</option>
+        <option value="reprovado" {% if request.GET.situacao == 'reprovado' %}selected{% endif %}>Reprovado</option>
+        <option value="transferido" {% if request.GET.situacao == 'transferido' %}selected{% endif %}>Transferido</option>
+      </select>
+    </div>
+    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
+      Filtrar
+    </button>
+    <a href="{% url 'notas:lancar' %}" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg text-center">
+      Lançar Nota
+    </a>
+  </form>
+</div>
+
+<!-- Tabela de notas -->
+<div class="bg-white rounded-lg shadow overflow-hidden">
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-50">
+      <tr>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aluno</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Disciplina</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Turma</th>
+        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Média</th>
+        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Situação</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+      {% for nota in notas %}
+      <tr>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <div class="text-sm font-medium text-gray-900">{{ nota.aluno.nome }}</div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ nota.disciplina }}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ nota.turma }}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">{{ nota.media }}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-center">
+          <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if nota.situacao == 'aprovado' %}bg-green-100 text-green-800{% elif nota.situacao == 'reprovado' %}bg-red-100 text-red-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
+            {{ nota.get_situacao_display }}
+          </span>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+          <a href="{% url 'notas:aluno' nota.aluno.pk %}" class="text-blue-600 hover:text-blue-900">Ver</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+          Nenhuma nota encontrada
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

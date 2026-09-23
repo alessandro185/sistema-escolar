@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+{% block title %}Relatório de Inconsistências - Escola Sistema{% endblock %}
+{% block content %}
+<div class="mb-8">
+  <div class="flex items-center justify-between flex-wrap gap-4">
+    <div>
+      <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">📋 Relatório de Inconsistências</h1>
+      <p class="text-slate-500 mt-2 dark:text-slate-400">Planilhas da Escola - Dados a verificar</p>
+    </div>
+    <a href="{% url 'dashboard:index' %}" class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium flex items-center gap-2">
+      <i data-lucide="arrow-left" class="w-5 h-5"></i>
+      Voltar ao Dashboard
+    </a>
+  </div>
+</div>
+
+<!-- Resumo -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+  <div class="card-hover bg-white dark:bg-slate-900 rounded-xl shadow-lg p-6 border-l-4 border-red-500">
+    <div class="text-3xl font-bold text-red-600 dark:text-red-400">{{ total_inconsistencias }}</div>
+    <div class="text-slate-500 dark:text-slate-400 text-sm mt-2">Total de inconsistências</div>
+  </div>
+  <div class="card-hover bg-white dark:bg-slate-900 rounded-xl shadow-lg p-6 border-l-4 border-orange-500">
+    <div class="text-3xl font-bold text-orange-600 dark:text-orange-400">{{ alunos_inconsistentes|length }}</div>
+    <div class="text-slate-500 dark:text-slate-400 text-sm mt-2">Alunos com problemas</div>
+  </div>
+  <div class="card-hover bg-white dark:bg-slate-900 rounded-xl shadow-lg p-6 border-l-4 border-yellow-500">
+    <div class="text-3xl font-bold text-yellow-600 dark:text-yellow-400">{{ tarefas|length }}</div>
+    <div class="text-slate-500 dark:text-slate-400 text-sm mt-2">Tarefas pendentes</div>
+  </div>
+</div>
+
+{% if tarefas %}
+<div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-6 mb-8">
+  <div class="flex items-center gap-3 mb-4">
+    <i data-lucide="alert-triangle" class="w-6 h-6 text-amber-600 dark:text-amber-400"></i>
+    <h2 class="text-xl font-bold text-amber-800 dark:text-amber-200">Pendências para a Diretora</h2>
+  </div>
+  <ul class="space-y-3">
+    {% for tarefa in tarefas %}
+    <li class="flex items-start gap-3">
+      <span class="text-amber-600 dark:text-amber-400 font-bold">[ ]</span>
+      <div class="flex-1">
+        <span class="text-slate-800 dark:text-slate-200">{{ tarefa.descricao }}</span>
+        {% if tarefa.tipo == 'aluno' %}
+        <a href="{% url 'alunos:editar' tarefa.objeto.pk %}" class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm ml-2 font-medium">
+          (Editar)
+        </a>
+        {% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<!-- Alunos -->
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 overflow-hidden mb-8">
+  <div class="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
+    <i data-lucide="users" class="w-6 h-6 text-slate-500 dark:text-slate-400"></i>
+    <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100">Controle de Alunos</h2>
+  </div>
+  <div class="p-6">
+    {% if alunos_inconsistentes %}
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead>
+          <tr class="bg-slate-50 dark:bg-slate-800">
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Matrícula</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Nome</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Problemas</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Ação</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+          {% for aluno in alunos_inconsistentes %}
+          <tr class="hover:bg-amber-50 dark:hover:bg-amber-900/10 transition">
+            <td class="px-6 py-4 text-sm font-medium text-slate-900 dark:text-slate-100">{{ aluno.matricula }}</td>
+            <td class="px-6 py-4 text-sm text-slate-700 dark:text-slate-300">{{ aluno.nome }}</td>
+            <td class="px-6 py-4">
+              <div class="space-y-2">
+                {% for problema in aluno.problemas %}
+                <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                  <i data-lucide="alert-triangle" class="w-3 h-3"></i>
+                  {{ problema }}
+                </span>
+                {% endfor %}
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <a href="{% url 'alunos:editar' aluno.aluno_obj.pk %}" class="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium">
+                <i data-lucide="edit-3" class="w-4 h-4"></i>
+                Editar
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-16">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-100 dark:bg-emerald-900/30 mb-4">
+        <i data-lucide="check-circle" class="w-10 h-10 text-emerald-600 dark:text-emerald-400"></i>
+      </div>
+      <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100">Nenhum aluno com inconsistências!</h3>
+      <p class="text-slate-500 dark:text-slate-400 mt-2">Todos os dados estão completos.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Professores -->
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 overflow-hidden mb-8">
+  <div class="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
+    <i data-lucide="user-check" class="w-6 h-6 text-slate-500 dark:text-slate-400"></i>
+    <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100">Professores</h2>
+  </div>
+  <div class="p-6">
+    {% if professores_inconsistentes %}
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead>
+          <tr class="bg-slate-50 dark:bg-slate-800">
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Nome</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Disciplina</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Problemas</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+          {% for prof in professores_inconsistentes %}
+          <tr class="hover:bg-amber-50 dark:hover:bg-amber-900/10 transition">
+            <td class="px-6 py-4 text-sm font-medium text-slate-900 dark:text-slate-100">{{ prof.nome }}</td>
+            <td class="px-6 py-4 text-sm text-slate-700 dark:text-slate-300">{{ prof.disciplina }}</td>
+            <td class="px-6 py-4">
+              <div class="space-y-2">
+                {% for problema in prof.problemas %}
+                <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300">
+                  <i data-lucide="alert-triangle" class="w-3 h-3"></i>
+                  {{ problema }}
+                </span>
+                {% endfor %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-16">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-100 dark:bg-emerald-900/30 mb-4">
+        <i data-lucide="check-circle" class="w-10 h-10 text-emerald-600 dark:text-emerald-400"></i>
+      </div>
+      <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100">Nenhum professor com inconsistências!</h3>
+      <p class="text-slate-500 dark:text-slate-400 mt-2">Todos os dados estão completos.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Funcionários -->
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 overflow-hidden mb-8">
+  <div class="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
+    <i data-lucide="briefcase" class="w-6 h-6 text-slate-500 dark:text-slate-400"></i>
+    <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100">Funcionários</h2>
+  </div>
+  <div class="p-6">
+    {% if funcionarios_inconsistentes %}
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead>
+          <tr class="bg-slate-50 dark:bg-slate-800">
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">ID Funcional</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Nome</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Cargo</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Problemas</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Ação</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+          {% for func in funcionarios_inconsistentes %}
+          <tr class="hover:bg-amber-50 dark:hover:bg-amber-900/10 transition">
+            <td class="px-6 py-4 text-sm font-medium text-slate-900 dark:text-slate-100">{{ func.id_func }}</td>
+            <td class="px-6 py-4 text-sm text-slate-700 dark:text-slate-300">{{ func.nome }}</td>
+            <td class="px-6 py-4 text-sm text-slate-700 dark:text-slate-300">{{ func.cargo }}</td>
+            <td class="px-6 py-4">
+              <div class="space-y-2">
+                {% for problema in func.problemas %}
+                <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                  <i data-lucide="alert-triangle" class="w-3 h-3"></i>
+                  {{ problema }}
+                </span>
+                {% endfor %}
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <a href="{% url 'funcionarios:detalhe' func.func_obj.pk %}" class="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium">
+                <i data-lucide="eye" class="w-4 h-4"></i>
+                Ver
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-16">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-100 dark:bg-emerald-900/30 mb-4">
+        <i data-lucide="check-circle" class="w-10 h-10 text-emerald-600 dark:text-emerald-400"></i>
+      </div>
+      <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100">Nenhum funcionário com inconsistências!</h3>
+      <p class="text-slate-500 dark:text-slate-400 mt-2">Todos os dados estão completos.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Notas -->
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 overflow-hidden">
+  <div class="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
+    <i data-lucide="file-text" class="w-6 h-6 text-slate-500 dark:text-slate-400"></i>
+    <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100">Notas</h2>
+  </div>
+  <div class="p-6">
+    {% if notas_inconsistentes %}
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead>
+          <tr class="bg-slate-50 dark:bg-slate-800">
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Aluno</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Turma</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Disciplina</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300">Problemas</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+          {% for nota in notas_inconsistentes %}
+          <tr class="hover:bg-amber-50 dark:hover:bg-amber-900/10 transition">
+            <td class="px-6 py-4 text-sm font-medium text-slate-900 dark:text-slate-100">{{ nota.aluno_nome }}</td>
+            <td class="px-6 py-4 text-sm text-slate-700 dark:text-slate-300">{{ nota.turma }}</td>
+            <td class="px-6 py-4 text-sm text-slate-700 dark:text-slate-300">{{ nota.disciplina }}</td>
+            <td class="px-6 py-4">
+              <div class="space-y-2">
+                {% for problema in nota.problemas %}
+                <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                  <i data-lucide="alert-triangle" class="w-3 h-3"></i>
+                  {{ problema }}
+                </span>
+                {% endfor %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-16">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-100 dark:bg-emerald-900/30 mb-4">
+        <i data-lucide="check-circle" class="w-10 h-10 text-emerald-600 dark:text-emerald-400"></i>
+      </div>
+      <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100">Nenhuma nota com inconsistências!</h3>
+      <p class="text-slate-500 dark:text-slate-400 mt-2">Todas as notas estão dentro dos limites e disciplinas padronizadas.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% block title %}Alunos - Escola Sistema{% endblock %}
+{% block content %}
+<style>
+  :root {
+    --color-primary: #2563eb;
+    --color-success: #16a34a;
+    --color-warning: #ca8a04;
+    --color-danger: #dc2626;
+    --color-gray-50: #f9fafb;
+    --color-gray-200: #e5e7eb;
+    --color-gray-500: #6b7280;
+    --color-gray-700: #374151;
+    --color-gray-800: #1f2937;
+  }
+  
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  
+  .badge-success {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+  
+  .badge-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+  }
+  
+  .table-responsive {
+    overflow-x: auto;
+  }
+  
+  .empty-state {
+    padding: 3rem;
+    text-align: center;
+    color: var(--color-gray-500);
+  }
+  
+  .empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+  }
+  
+  .warning-icon {
+    color: var(--color-warning);
+  }
+</style>
+
+<div class="mb-8">
+  <h1 class="text-3xl font-bold text-gray-800">Alunos</h1>
+  <p class="text-gray-600 mt-2">Gestão de alunos do sistema</p>
+</div>
+
+<!-- Cards de contagem -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+  <div class="bg-white rounded-lg shadow p-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-gray-500">Total</p>
+        <p class="text-2xl font-bold text-gray-800">{{ contagem_status.total }}</p>
+      </div>
+      <div class="text-3xl">👥</div>
+    </div>
+  </div>
+  <div class="bg-white rounded-lg shadow p-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-gray-500">Ativos</p>
+        <p class="text-2xl font-bold text-green-600">{{ contagem_status.ativos }}</p>
+      </div>
+      <div class="text-3xl">✅</div>
+    </div>
+  </div>
+  <div class="bg-white rounded-lg shadow p-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-gray-500">Inativos</p>
+        <p class="text-2xl font-bold text-red-600">{{ contagem_status.inativos }}</p>
+      </div>
+      <div class="text-3xl">⛔</div>
+    </div>
+  </div>
+</div>
+
+<!-- Formulário de filtro e busca -->
+<div class="bg-white rounded-lg shadow p-6 mb-6">
+  <form method="get" class="flex flex-col md:flex-row gap-4 flex-wrap">
+    <div class="w-full md:w-64">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
+      <input type="text" id="busca" placeholder="Buscar por nome ou matrícula..." 
+             class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+      <div id="resultados-busca" class="mt-2 hidden"></div>
+    </div>
+    
+    <div class="w-full md:w-48">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Turma</label>
+      <select name="turma" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        <option value="">Todas as turmas</option>
+        {% for turma in turmas %}
+        <option value="{{ turma.pk }}" {% if turma_selecionada == turma.pk|stringformat:"i" %}selected{% endif %}>
+          {{ turma.ano }}º {{ turma.letra }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    
+    <div class="w-full md:w-48">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+      <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        <option value="">Todos</option>
+        <option value="ativo" {% if status_selecionado == 'ativo' %}selected{% endif %}>Ativo</option>
+        <option value="inativo" {% if status_selecionado == 'inativo' %}selected{% endif %}>Inativo</option>
+      </select>
+    </div>
+    
+    <div class="flex items-end gap-2">
+      <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
+        Filtrar
+      </button>
+      <a href="{% url 'alunos:lista' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg">
+        Limpar
+      </a>
+      <a href="{% url 'alunos:criar' %}" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg">
+        Novo Aluno
+      </a>
+    </div>
+  </form>
+</div>
+
+<!-- Tabela de alunos -->
+<div class="bg-white rounded-lg shadow overflow-hidden">
+  {% if alunos %}
+  <div class="table-responsive">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Matrícula</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Turma</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Responsável</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        {% for aluno in alunos %}
+        <tr class="hover:bg-gray-50">
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">{{ aluno.matricula }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm font-medium text-gray-900">{{ aluno.nome }}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {% if aluno.turma %}{{ aluno.turma.ano }}º {{ aluno.turma.letra }}{% else %}-{% endif %}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            {% if aluno.ativo %}
+            <span class="badge badge-success">Ativo</span>
+            {% else %}
+            <span class="badge badge-danger">Inativo</span>
+            {% endif %}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center gap-2">
+              {% if aluno.responsavel_nome %}
+              <span class="text-sm text-gray-900">{{ aluno.responsavel_nome }}</span>
+              {% else %}
+              <span class="text-sm text-gray-500">Não informado</span>
+              {% endif %}
+              {% if not aluno.responsavel_telefone or aluno.responsavel_telefone == '' or aluno.endereco == 'Não consta' %}
+              <span class="warning-icon" title="Dados incompletos">⚠️</span>
+              {% endif %}
+            </div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+            <a href="{% url 'alunos:detalhes' aluno.pk %}" class="text-blue-600 hover:text-blue-900">Ver</a>
+            <a href="{% url 'alunos:editar' aluno.pk %}" class="text-yellow-600 hover:text-yellow-900">Editar</a>
+            <a href="{% url 'alunos:deletar' aluno.pk %}" class="text-red-600 hover:text-red-900">Remover</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">👥</div>
+    <h3 class="text-lg font-medium text-gray-800 mb-2">Nenhum aluno encontrado</h3>
+    <p class="text-gray-500">Não há alunos que correspondam aos filtros selecionados.</p>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Paginação -->
+{% if page_obj.has_other_pages %}
+<div class="mt-6 flex justify-center">
+  <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}{% if turma_selecionada %}&turma={{ turma_selecionada }}{% endif %}{% if status_selecionado %}&status={{ status_selecionado }}{% endif %}" 
+       class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+      Anterior
+    </a>
+    {% endif %}
+    <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+      Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+    </span>
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}{% if turma_selecionada %}&turma={{ turma_selecionada }}{% endif %}{% if status_selecionado %}&status={{ status_selecionado }}{% endif %}" 
+       class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+      Próximo
+    </a>
+    {% endif %}
+  </nav>
+</div>
+{% endif %}
+
+<script>
+const buscaInput = document.getElementById('busca');
+const resultadosDiv = document.getElementById('resultados-busca');
+
+buscaInput.addEventListener('input', async function() {
+  const query = this.value.trim();
+  
+  if (query.length < 2) {
+    resultadosDiv.classList.add('hidden');
+    return;
+  }
+  
+  try {
+    const response = await fetch(`{% url 'alunos:buscar' %}?q=${encodeURIComponent(query)}`);
+    const data = await response.json();
+    
+    if (data.resultados.length > 0) {
+      resultadosDiv.innerHTML = `
+        <div class="bg-white border border-gray-300 rounded-lg shadow-lg max-h-64 overflow-y-auto">
+          ${data.resultados.map(aluno => `
+            <a href="${aluno.url}" class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0">
+              <div class="font-medium text-gray-900">${aluno.nome}</div>
+              <div class="text-sm text-gray-500">${aluno.matricula}${aluno.turma ? ' • ' + aluno.turma : ''}</div>
+            </a>
+          `).join('')}
+        </div>
+      `;
+      resultadosDiv.classList.remove('hidden');
+    } else {
+      resultadosDiv.classList.add('hidden');
+    }
+  } catch (error) {
+    console.error('Erro na busca:', error);
+  }
+});
+
+document.addEventListener('click', function(e) {
+  if (!buscaInput.contains(e.target) && !resultadosDiv.contains(e.target)) {
+    resultadosDiv.classList.add('hidden');
+  }
+});
+</script>
+{% endblock %}

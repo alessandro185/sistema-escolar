@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Notas de {{ aluno.nome }} - Escola Sistema{% endblock %}
+{% block content %}
+<div class="mb-8">
+  <a href="{% url 'notas:lista' %}" class="text-blue-600 hover:text-blue-800 mb-4 inline-block">← Voltar para notas</a>
+  <h1 class="text-3xl font-bold text-gray-800">Notas de {{ aluno.nome }}</h1>
+  <p class="text-gray-600 mt-2">Matrícula: {{ aluno.matricula }}</p>
+</div>
+
+<!-- Resumo -->
+<div class="bg-white rounded-lg shadow p-6 mb-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <p class="text-gray-500 text-sm">Média Geral</p>
+      <p class="text-4xl font-bold {% if media_geral >= 7 %}text-green-600{% elif media_geral >= 5 %}text-yellow-600{% else %}text-red-600{% endif %}">{{ media_geral }}</p>
+    </div>
+    <div class="text-6xl">📝</div>
+  </div>
+</div>
+
+<!-- Notas por disciplina -->
+<div class="bg-white rounded-lg shadow overflow-hidden mb-6">
+  <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+    <h2 class="text-xl font-bold text-gray-800">Notas por Disciplina</h2>
+    <a href="{% url 'notas:lancar_aluno' aluno.pk %}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm">
+      Lançar Nova Nota
+    </a>
+  </div>
+  {% if notas %}
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Disciplina</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Professor</th>
+          <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">1º Bim</th>
+          <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">2º Bim</th>
+          <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">3º Bim</th>
+          <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">4º Bim</th>
+          <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Média</th>
+          <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Situação</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        {% for nota in notas %}
+        <tr>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ nota.disciplina }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ nota.professor|default:"-" }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ nota.nota_1|default:"-" }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ nota.nota_2|default:"-" }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ nota.nota_3|default:"-" }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ nota.nota_4|default:"-" }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">{{ nota.media }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-center">
+            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if nota.situacao == 'aprovado' %}bg-green-100 text-green-800{% elif nota.situacao == 'reprovado' %}bg-red-100 text-red-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
+              {{ nota.get_situacao_display }}
+            </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="p-8 text-center">
+    <p class="text-gray-500 text-lg">Nenhuma nota registrada para este aluno</p>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Link para voltar ao aluno -->
+<div class="text-center">
+  <a href="{% url 'alunos:detalhes' aluno.pk %}" class="text-blue-600 hover:text-blue-800">
+    Ver perfil completo do aluno →
+  </a>
+</div>
+{% endblock %}

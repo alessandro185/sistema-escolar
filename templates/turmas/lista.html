@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Turmas - Escola Sistema{% endblock %}
+{% block content %}
+<div class="mb-8">
+  <h1 class="text-3xl font-bold text-gray-800">Turmas</h1>
+  <p class="text-gray-600 mt-2">Gestão de turmas do sistema</p>
+</div>
+
+<div class="flex justify-end mb-6">
+  <a href="{% url 'turmas:criar' %}" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg">
+    Nova Turma
+  </a>
+</div>
+
+<!-- Grid de turmas -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  {% for turma in turmas %}
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="px-6 py-4 {% if turma.ativa %}bg-blue-600{% else %}bg-gray-400{% endif %}">
+      <div class="flex justify-between items-center">
+        <h3 class="text-xl font-bold text-white">{{ turma.ano }}º Ano - Turma {{ turma.letra }}</h3>
+        <span class="text-white text-sm">{{ turma.ano_letivo }}</span>
+      </div>
+    </div>
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <p class="text-gray-500 text-sm">Total de Alunos</p>
+          <p class="text-2xl font-bold text-gray-800">{{ turma.total_alunos }}</p>
+        </div>
+        <div class="text-4xl">📚</div>
+      </div>
+      <div class="flex justify-between items-center mb-4">
+        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if turma.ativa %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+          {% if turma.ativa %}Ativa{% else %}Inativa{% endif %}
+        </span>
+      </div>
+      <div class="flex space-x-2">
+        <a href="{% url 'turmas:detalhes' turma.pk %}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-center text-sm">
+          Ver Detalhes
+        </a>
+        <a href="{% url 'turmas:editar' turma.pk %}" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg text-sm">
+          Editar
+        </a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="md:col-span-3 bg-white rounded-lg shadow p-8 text-center">
+    <p class="text-gray-500 text-lg">Nenhuma turma cadastrada</p>
+    <a href="{% url 'turmas:criar' %}" class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
+      Criar Primeira Turma
+    </a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

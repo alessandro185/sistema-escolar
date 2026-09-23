@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block title %}{{ professor.usuario.get_full_name }} - Escola Sistema{% endblock %}
+{% block content %}
+<div class="mb-8">
+  <a href="{% url 'professores:lista' %}" class="text-blue-600 hover:text-blue-800 mb-4 inline-block">← Voltar para lista</a>
+  <h1 class="text-3xl font-bold text-gray-800">{{ professor.usuario.get_full_name|default:professor.usuario.username }}</h1>
+  <p class="text-gray-600 mt-2">{{ professor.disciplina }}</p>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- Informações do professor -->
+  <div class="lg:col-span-1">
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex flex-col items-center mb-6">
+        <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+          <span class="text-4xl">👨‍🏫</span>
+        </div>
+        <span class="px-3 inline-flex text-sm leading-5 font-semibold rounded-full {% if professor.ativo %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+          {% if professor.ativo %}Ativo{% else %}Inativo{% endif %}
+        </span>
+      </div>
+      
+      <h2 class="text-xl font-bold text-gray-800 mb-4">Informações</h2>
+      <div class="space-y-4">
+        <div>
+          <p class="text-sm text-gray-500">Usuário</p>
+          <p class="text-gray-800">{{ professor.usuario.username }}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">Email</p>
+          <p class="text-gray-800">{{ professor.usuario.email|default:"-" }}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">Disciplina</p>
+          <p class="text-gray-800">{{ professor.disciplina }}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">Carga Horária</p>
+          <p class="text-gray-800">{{ professor.carga_horaria }} horas/semana</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">Turmas</p>
+          <p class="text-gray-800">{{ turmas.count }}</p>
+        </div>
+      </div>
+      
+      <div class="mt-6">
+        <a href="{% url 'professores:editar' professor.pk %}" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-center block">
+          Editar Professor
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Turmas e notas -->
+  <div class="lg:col-span-2 space-y-6">
+    <!-- Turmas -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-xl font-bold text-gray-800 mb-4">Turmas</h2>
+      {% if turmas %}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for turma in turmas %}
+        <a href="{% url 'turmas:detalhes' turma.pk %}" class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+          <div class="flex items-center space-x-3">
+            <div class="text-2xl">📚</div>
+            <div>
+              <p class="font-medium text-gray-800">{{ turma.ano }}º Ano - Turma {{ turma.letra }}</p>
+              <p class="text-sm text-gray-500">{{ turma.ano_letivo }}</p>
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="text-gray-500">Nenhuma turma associada</p>
+      {% endif %}
+    </div>
+    
+    <!-- Notas recentes -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-xl font-bold text-gray-800 mb-4">Notas Lançadas</h2>
+      {% if notas %}
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aluno</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Turma</th>
+              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Média</th>
+              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Situação</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            {% for nota in notas|slice:":10" %}
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ nota.aluno.nome }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ nota.turma }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">{{ nota.media }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-center">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if nota.situacao == 'aprovado' %}bg-green-100 text-green-800{% elif nota.situacao == 'reprovado' %}bg-red-100 text-red-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                  {{ nota.get_situacao_display }}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-gray-500">Nenhuma nota lançada</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Remover {{ aluno.nome }} - Escola Sistema{% endblock %}
+{% block content %}
+<div class="mb-8">
+  <a href="{% url 'alunos:detalhes' aluno.pk %}" class="text-blue-600 hover:text-blue-800 mb-4 inline-block">← Voltar</a>
+  <h1 class="text-3xl font-bold text-gray-800">Remover Aluno</h1>
+</div>
+
+<div class="bg-white rounded-lg shadow p-8 max-w-2xl">
+  <div class="text-center">
+    <div class="text-red-500 text-6xl mb-4">⚠️</div>
+    <h2 class="text-2xl font-bold text-gray-800 mb-2">Tem certeza?</h2>
+    <p class="text-gray-600 mb-6">Você está prestes a remover o aluno <strong>{{ aluno.nome }}</strong> (matrícula {{ aluno.matricula }}).</p>
+    
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+      <p class="text-yellow-800 text-sm">
+        <strong>Aviso:</strong> O aluno não será apagado permanentemente, apenas marcado como inativo.
+      </p>
+    </div>
+    
+    <form method="post" class="flex justify-center space-x-4">
+      {% csrf_token %}
+      <a href="{% url 'alunos:detalhes' aluno.pk %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg">
+        Cancelar
+      </a>
+      <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg">
+        Confirmar Remoção
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

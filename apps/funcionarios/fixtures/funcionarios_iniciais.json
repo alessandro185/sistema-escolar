@@ -1,0 +1,110 @@
+[
+  {
+    "model": "funcionarios.funcionario",
+    "pk": 1,
+    "fields": {
+      "id_func": "FUNC-728",
+      "nome": "Ana Beatriz",
+      "cargo": "diretor",
+      "departamento": "pedagogico",
+      "carga_horaria": 40,
+      "salario_base": 8000.00,
+      "salario_obs": "",
+      "data_admissao": "2020-01-15",
+      "data_admissao_obs": "",
+      "ativo": true,
+      "criado_em": "2026-01-01T00:00:00Z",
+      "atualizado_em": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "funcionarios.funcionario",
+    "pk": 2,
+    "fields": {
+      "id_func": "FUNC-745",
+      "nome": "Roberto Gomes",
+      "cargo": "administrativo",
+      "departamento": "administrativo",
+      "carga_horaria": 44,
+      "salario_base": null,
+      "salario_obs": "A combinar",
+      "data_admissao": "2021-05-20",
+      "data_admissao_obs": "",
+      "ativo": true,
+      "criado_em": "2026-01-01T00:00:00Z",
+      "atualizado_em": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "funcionarios.funcionario",
+    "pk": 3,
+    "fields": {
+      "id_func": "FUNC-509",
+      "nome": "Jose da Silva",
+      "cargo": "professor",
+      "departamento": "exatas",
+      "carga_horaria": 40,
+      "salario_base": 4500.00,
+      "salario_obs": "",
+      "data_admissao": null,
+      "data_admissao_obs": "DATA ERRADA — verificar com RH",
+      "ativo": true,
+      "criado_em": "2026-01-01T00:00:00Z",
+      "atualizado_em": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "funcionarios.funcionario",
+    "pk": 4,
+    "fields": {
+      "id_func": "FUNC-171",
+      "nome": "Mariana Santos",
+      "cargo": "professor",
+      "departamento": "humanas",
+      "carga_horaria": 40,
+      "salario_base": 4200.00,
+      "salario_obs": "",
+      "data_admissao": "2019-08-10",
+      "data_admissao_obs": "",
+      "ativo": true,
+      "criado_em": "2026-01-01T00:00:00Z",
+      "atualizado_em": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "funcionarios.funcionario",
+    "pk": 5,
+    "fields": {
+      "id_func": "FUNC-322",
+      "nome": "Carlos Pereira",
+      "cargo": "coordenador",
+      "departamento": "pedagogico",
+      "carga_horaria": 40,
+      "salario_base": 6000.00,
+      "salario_obs": "",
+      "data_admissao": "2018-03-01",
+      "data_admissao_obs": "",
+      "ativo": true,
+      "criado_em": "2026-01-01T00:00:00Z",
+      "atualizado_em": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "funcionarios.funcionario",
+    "pk": 6,
+    "fields": {
+      "id_func": "FUNC-888",
+      "nome": "Juliana Costa",
+      "cargo": "professor",
+      "departamento": "artes",
+      "carga_horaria": 40,
+      "salario_base": 3800.00,
+      "salario_obs": "",
+      "data_admissao": "2022-11-25",
+      "data_admissao_obs": "",
+      "ativo": true,
+      "criado_em": "2026-01-01T00:00:00Z",
+      "atualizado_em": "2026-01-01T00:00:00Z"
+    }
+  }
+]
