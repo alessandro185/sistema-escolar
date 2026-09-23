@@ -11,13 +11,14 @@ O projeto usa Django com WSGI (`config.wsgi.application`). A Vercel detecta o `m
 
 | Variável | Valor |
 | --- | --- |
-| `DEBUG` | `False` |
 | `SECRET_KEY` | Segredo aleatório longo e exclusivo; gere um valor novo, não reutilize a chave local. |
 | `DATABASE_URL` | URL de um PostgreSQL gerenciado, com SSL quando exigido pelo provedor. |
 | `ALLOWED_HOSTS` | `.vercel.app,seu-dominio.com` (inclua seu domínio próprio, se usar). |
 | `CSRF_TRUSTED_ORIGINS` | `https://*.vercel.app,https://seu-dominio.com` (inclua a origem HTTPS do domínio próprio). |
 
 `ALLOWED_HOSTS` e `CSRF_TRUSTED_ORIGINS` podem ser omitidas se usar somente o domínio `*.vercel.app`. O banco não deve ser SQLite: o sistema de arquivos de uma Function não é armazenamento persistente. Crie/conecte um PostgreSQL por um provedor integrado à Vercel e use a URL de conexão de produção.
+
+O Django usa `DEBUG=False` por padrao na Vercel; nao crie essa variavel. Se `SECRET_KEY` ou `DATABASE_URL` estiver ausente, o build inicia com avisos, mas a chave sera temporaria e o SQLite em `/tmp` nao persiste. Configure as duas variaveis para login e dados funcionarem corretamente.
 
 ## Banco de dados
 

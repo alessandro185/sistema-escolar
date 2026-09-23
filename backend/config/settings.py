@@ -3,8 +3,10 @@ Django settings for escola_sistema project.
 """
 
 import os
+import sys
 from pathlib import Path
 from decouple import config, Csv
+from django.core.management.utils import get_random_secret_key
 import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -18,7 +20,12 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 if DEBUG:
     SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-only-key')
 else:
-    SECRET_KEY = config('SECRET_KEY')  # obrigatório em produção
+    SECRET_KEY = config('SECRET_KEY', default='')
+    if not SECRET_KEY:
+        # Não derruba o build/deploy: gera chave temporária e avisa.
+        # Defina SECRET_KEY nas variáveis de ambiente da Vercel.
+        print('AVISO: SECRET_KEY nao definida; usando chave temporaria.', file=sys.stderr)
+        SECRET_KEY = get_random_secret_key()
 
 ALLOWED_HOSTS = config(
     'ALLOWED_HOSTS',
@@ -94,11 +101,26 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # Em produção defina DATABASE_URL (ex.: postgresql://user:senha@host/db?sslmode=require).
 # Sem DATABASE_URL, usa SQLite local na raiz do repositório.
-DATABASE_URL = config('DATABASE_URL', default=None)
+
+
+def _limpar_database_url(valor):
+    """Remove erros comuns de copia: espacos, aspas e o prefixo 'psql'."""
+    if not valor:
+        return None
+    valor = valor.strip()
+    if valor.lower().startswith('psql'):
+        valor = valor[4:].strip()
+    return valor.strip('\'"').strip() or None
+
+
+DATABASE_URL = _limpar_database_url(config('DATABASE_URL', default=None))
 if not DATABASE_URL:
-    if not DEBUG:
-        raise ValueError('Configure DATABASE_URL com um PostgreSQL persistente em producao.')
-    DATABASE_URL = f"sqlite:///{BASE_DIR.parent / 'db.sqlite3'}"
+    if DEBUG:
+        DATABASE_URL = f"sqlite:///{BASE_DIR.parent / 'db.sqlite3'}"
+    else:
+        # Não derruba o build/deploy; o site sobe, mas sem banco persistente.
+        print('AVISO: DATABASE_URL nao definida; defina um PostgreSQL na Vercel.', file=sys.stderr)
+        DATABASE_URL = 'sqlite:////tmp/db.sqlite3'
 
 DATABASES = {
     'default': dj_database_url.parse(
