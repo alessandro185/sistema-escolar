@@ -45,7 +45,7 @@ echo ========================================
 echo.
 echo Contas de teste:
 echo   - Usuario: admin | Senha: admin123
-echo   - Usuario: professor1 | Senha: professor123
+echo   - Usuario: prof1 | Senha: prof123
 echo   - Usuario: admin_esc | Senha: admin123
 echo.
 echo Pressione CTRL+C para parar o servidor
