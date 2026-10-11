@@ -76,5 +76,5 @@ class Command(BaseCommand):
             )
         
         self.stdout.write(
-            self.style.SUCCESS('✅ Todos os usuários de teste foram criados!')
+            self.style.SUCCESS('[OK] Todos os usuarios de teste foram criados!')
         )
